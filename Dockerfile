@@ -8,14 +8,12 @@ RUN \
 	echo 'metadata_expire=never' >> /etc/dnf/dnf.conf && \
 	dnf install -y \
 		busybox \
+		icu \
+		compat-openssl10 \
 	&& \
+	dnf clean all && \
 	true
 
-RUN \
-	dnf install -y \
-		icu \
-	&& \
-	true
 
 ARG GROUP_NAME=azrpa
 ARG GROUP_ID=29942
@@ -36,12 +34,6 @@ RUN \
 	busybox tar -xvf /var/tmp/pkg.tar.gz -C /opt/vsts-agent/ && \
 	rm -v /var/tmp/pkg.tar.gz && \
 	chown -R ${USER_NAME}:${GROUP_NAME} /opt/vsts-agent/ && \
-	true
-
-RUN \
-	dnf install -y \
-		compat-openssl10 \
-	&& \
 	true
 
 COPY common-files/profile-vsts-agent.sh /etc/profile.d/vsts-agent.sh
