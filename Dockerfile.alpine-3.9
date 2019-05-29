@@ -1,0 +1,67 @@
+# syntax = docker/dockerfile:experimental
+# https://docs.docker.com/engine/reference/builder/
+# https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/experimental.md
+#FROM docker.io/alpine:3.9
+FROM docker.io/frolvlad/alpine-glibc:alpine-3.9_glibc-2.29
+ARG MOUNT_CACHE=
+ARG CLEAN_CACHE=true
+ARG AGENT_VERSION=2.152.0
+ARG AGENT_OS=linux
+ARG AGENT_ARCH=x64
+
+ARG GROUP_NAME=azrpa
+ARG GROUP_ID=29942
+ARG USER_NAME=azrpa
+ARG USER_ID=29942
+
+# https://busybox.net/downloads/BusyBox.html#addgroup
+# https://busybox.net/downloads/BusyBox.html#adduser
+RUN \
+	echo CLEAN_CACHE=${CLEAN_CACHE} && \
+	ls -l /var/cache/ && \
+	echo addgroup -g ${GROUP_ID} ${GROUP_NAME} && \
+	echo adduser -H -h /var/opt/vsts-agent/ -s /sbin/nologin -g ${GROUP_NAME} -D -u ${USER_ID} ${USER_NAME} && \
+	adduser -H -h /var/opt/vsts-agent/ -s /sbin/nologin -g ${GROUP_NAME} -D -u ${USER_ID} ${USER_NAME} && \
+	mkdir -p /var/opt/vsts-agent/ /opt/vsts-agent/ && \
+	chown -R ${USER_NAME}:${GROUP_NAME} /var/opt/vsts-agent/ /opt/vsts-agent/ && \
+	ls -l /var/cache/ && \
+	true
+
+RUN \
+	echo CLEAN_CACHE=${CLEAN_CACHE} && \
+	ls -l /var/cache/ && \
+	{ [ -e /var/cache/vsts-agent-${AGENT_OS}-${AGENT_ARCH}-${AGENT_VERSION}.tar.gz ] || busybox wget -c -O /var/cache/vsts-agent-${AGENT_OS}-${AGENT_ARCH}-${AGENT_VERSION}.tar.gz https://vstsagentpackage.azureedge.net/agent/2.152.0/vsts-agent-${AGENT_OS}-${AGENT_ARCH}-${AGENT_VERSION}.tar.gz; } && \
+	busybox tar -xf /var/cache/vsts-agent-${AGENT_OS}-${AGENT_ARCH}-${AGENT_VERSION}.tar.gz -C /opt/vsts-agent/ && \
+	chown -R ${USER_NAME}:${GROUP_NAME} /opt/vsts-agent/ && \
+	$(${CLEAN_CACHE} || echo "echo SKIPPING: ") rm -v /var/cache/vsts-agent-${AGENT_OS}-${AGENT_ARCH}-${AGENT_VERSION}.tar.gz && \
+	ls -l /var/cache/ && \
+	true
+
+#		gcompat \
+#		libc6-compat \
+
+RUN \
+	echo CLEAN_CACHE=${CLEAN_CACHE} && \
+	ls -l /var/cache/ && \
+	mkdir -p /var/cache/apk/ && \
+	$(${CLEAN_CACHE} || echo "echo SKIPPING: ") ln -s /var/cache/apk /etc/apk/cache && \
+	apk add \
+		bash \
+		libstdc++ \
+		libstdc++6 \
+	&& \
+	ls -l /var/cache/ && \
+	true
+
+COPY common-files/profile-vsts-agent.sh /etc/profile.d/vsts-agent.sh
+COPY common-files/vsts-script.sh /opt/vsts-agent/bin/
+RUN ln -s vsts-script.sh /opt/vsts-agent/bin/vsts-start.sh
+ENV PATH /opt/vsts-agent/bin:$PATH
+
+USER ${USER_NAME}:${GROUP_NAME}
+WORKDIR /var/opt/vsts-agent/
+VOLUME /var/opt/vsts-agent/
+
+#ENTRYPOINT ["/opt/vsts-agent/bin/vsts-entrypoint.sh"]
+
+CMD ["vsts-script.sh", "start"]
