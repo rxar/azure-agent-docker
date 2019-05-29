@@ -27,10 +27,11 @@ docker_build_args= \
 	--build-arg "CLEAN_CACHE=$(clean_cache)" \
 	--build-arg "AGENT_VERSION=$(AGENT_VERSION)" \
 
-git_changes=$(shell [[ -z $$(git status -s) ]] || echo "m")
+git_changes=$(shell [[ -z $$(git status -s) ]] && echo "s" || echo "m")
+git_commits_hash=$(shell git rev-list HEAD | md5sum | cut -c 1-4)
 git_commits=$(shell git rev-list --count HEAD)
 
-git_suffix=$(git_commits)$(git_changes)
+git_suffix=$(git_commits)$(git_changes)-$(git_commits_hash)
 
 build/:
 	mkdir $(@)
