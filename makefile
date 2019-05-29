@@ -27,6 +27,11 @@ docker_build_args= \
 	--build-arg "CLEAN_CACHE=$(clean_cache)" \
 	--build-arg "AGENT_VERSION=$(AGENT_VERSION)" \
 
+git_changes=$(shell [[ -z $$(git status -s) ]] || echo "m")
+git_commits=$(shell git rev-list --count HEAD)
+
+git_suffix=$(git_commits)$(git_changes)
+
 build/:
 	mkdir $(@)
 
@@ -36,6 +41,7 @@ build/:
 image:
 	grep -H . <( cat Dockerfile.$(OS_NAME)-$(OS_VERSION) | $(docker_file_translate) )
 	cat Dockerfile.$(OS_NAME)-$(OS_VERSION) | $(docker_file_translate) | $(docker_build) $(docker_build_args) \
+		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(git_suffix) \
 		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-staging \
 		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-latest \
 		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-staging \
@@ -56,5 +62,6 @@ exec-sh:
 
 .PHONY: push
 push: image
+	docker push docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-$(git_suffix)
 	docker push docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-latest
 	docker push docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-latest
