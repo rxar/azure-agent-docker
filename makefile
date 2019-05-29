@@ -6,6 +6,9 @@ OS_VERSION=3.9
 OS_NAME=fedora
 OS_VERSION=29
 
+OS_NAME=centos
+OS_VERSION=7
+
 AGENT_VERSION=2.152.0
 AGENT_OS=linux
 AGENT_ARCH=x64
@@ -27,10 +30,10 @@ docker_build_args= \
 build/:
 	mkdir $(@)
 
-build/Dockerfile.tr.$(OS_NAME)-$(OS_VERSION): Dockerfile.$(OS_NAME)-$(OS_VERSION)
+#build/Dockerfile.tr.$(OS_NAME)-$(OS_VERSION): Dockerfile.$(OS_NAME)-$(OS_VERSION)
 
 .PHONY: image
-image: build/Dockerfile.tr.$(OS_NAME)-$(OS_VERSION)
+image:
 	grep -H . <( cat Dockerfile.$(OS_NAME)-$(OS_VERSION) | $(docker_file_translate) )
 	cat Dockerfile.$(OS_NAME)-$(OS_VERSION) | $(docker_file_translate) | $(docker_build) $(docker_build_args) \
 		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-staging \
