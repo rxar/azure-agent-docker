@@ -1,0 +1,34 @@
+# If you don't know what this is for, look at https://editorconfig.org. It is basically a common format for all editors
+# to specify common editor settings, such as tab size. With this approach you can use the same settings for one project
+# for any editor you use in the project without configuring it separately.
+
+# Tells editor to stop looking further for .editorconfig files. Since these can exist in parent directories.
+root = true
+
+# Sets indent style and size for ALL files. Use e.g. [*.py] to give settings for python files
+[*]
+indent_style = tab
+indent_size = 4
+tab_width = 4
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+tab_width = 2
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[{makefile,Makefile,*.mk,*.make}]
+indent_style = tab
+indent_size = 4
+tab_width = 4
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
