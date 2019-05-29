@@ -41,11 +41,11 @@ build/:
 image:
 	grep -H . <( cat Dockerfile.$(OS_NAME)-$(OS_VERSION) | $(docker_file_translate) )
 	cat Dockerfile.$(OS_NAME)-$(OS_VERSION) | $(docker_file_translate) | $(docker_build) $(docker_build_args) \
-		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(git_suffix) \
 		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-staging \
 		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-latest \
 		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-staging \
 		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-latest \
+		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-r$(git_suffix) \
 		-f - .
 
 .PHONY: runit-sh
@@ -62,6 +62,6 @@ exec-sh:
 
 .PHONY: push
 push: image
-	docker push docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-$(git_suffix)
+	docker push docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-r$(git_suffix)
 	docker push docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-latest
 	docker push docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-latest
