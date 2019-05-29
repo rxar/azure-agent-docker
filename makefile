@@ -45,7 +45,7 @@ image:
 		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-latest \
 		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-staging \
 		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-latest \
-		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-r$(git_suffix) \
+		--tag docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-c$(git_suffix) \
 		-f - .
 
 .PHONY: runit-sh
@@ -62,6 +62,6 @@ exec-sh:
 
 .PHONY: push
 push: image
-	docker push docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-r$(git_suffix)
+	docker push docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-c$(git_suffix)
 	docker push docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-$(AGENT_VERSION)-latest
 	docker push docker.io/rxar/vsts-agent:$(OS_NAME)-$(OS_VERSION)-latest
